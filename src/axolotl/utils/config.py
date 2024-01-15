@@ -78,7 +78,7 @@ def normalize_config(cfg):
     else:
         torch.backends.cuda.matmul.allow_tf32 = cfg.tf32 or False
 
-    if cfg.bf16 or cfg.bfloat16:
+    if cfg.bf16 is True or cfg.bfloat16:
         cfg.torch_dtype = torch.bfloat16
     elif cfg.load_in_8bit or cfg.fp16 or cfg.float16:
         cfg.torch_dtype = torch.float16
@@ -182,7 +182,7 @@ def validate_config(cfg):
         if not cfg.bf16 and not cfg.bfloat16:
             LOG.info("bf16 support detected, but not enabled for this configuration.")
     else:
-        if not cfg.merge_lora and (cfg.bf16 or cfg.bfloat16):
+        if not cfg.merge_lora and (cfg.bf16 is True or cfg.bfloat16):
             raise ValueError(
                 "bf16 requested, but AMP is not supported on this GPU. Requires Ampere series or above."
             )
@@ -294,7 +294,7 @@ def validate_config(cfg):
     if cfg.flash_optimum is True:
         if cfg.adapter:
             LOG.warning("BetterTransformers probably doesn't work with PEFT adapters")
-        if cfg.fp16 or cfg.bf16:
+        if cfg.fp16 or cfg.bf16 is True:
             raise ValueError("AMP is not supported with BetterTransformer")
         if cfg.float16 is not True and cfg.bloat16 is not True:
             LOG.warning(
